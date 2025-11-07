@@ -46,6 +46,17 @@
               Aplicado al contenedor que SÍ scrollea.
             */
             scroll-snap-type: y mandatory;
+
+            /* --- LA SOLUCIÓN: Ocultar la barra de scroll --- */
+            /* Para Firefox */
+            scrollbar-width: none;
+            /* Para IE y Edge */
+            -ms-overflow-style: none;
+        }
+
+        /* Para Chrome, Safari y Opera */
+        #scroll-container::-webkit-scrollbar {
+            display: none;
         }
 
 
@@ -210,7 +221,7 @@
             text-align: center;
             padding: 20px;
             width: 100%;
-            background-color: transparent; /* Deja ver el fondo fijo */
+            background-color: #000; /* ANTES: transparent. Ahora es negro sólido. */
             z-index: 2; /* Encima del fondo fijo */
         }
 

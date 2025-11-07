@@ -8,111 +8,160 @@
     <!-- Importar la fuente Cal Sans -->
     <link href="https://api.fontshare.com/v2/css?f[]=cal-sans@600&display=swap" rel="stylesheet">
     
+    <!-- Importar la fuente DM Sans (para el input de email) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@200&display=swap" rel="stylesheet">
+    
     <style>
         /* --- Configuración Global --- */
-        html {
-            scroll-behavior: smooth;
+        html, body {
+            margin: 0;
+            padding: 0;
+            /* CLAVE: Evita el scroll en la ventana principal */
+            overflow: hidden; 
+            height: 100%; 
+            background-color: #000;
         }
 
         body {
-            margin: 0;
-            padding: 0;
             font-family: 'Cal Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #000;
             color: white;
-            overflow-x: hidden;
         }
 
         * {
             box-sizing: border-box;
         }
 
-        /* --- 1. Cabecera / Pantalla de Bienvenida --- */
+        /* --- NUEVO CONTENEDOR DE SCROLL --- */
+        #scroll-container {
+            position: relative;
+            z-index: 2; /* Encima del fondo fijo */
+            width: 100%;
+            height: 100dvh; /* Ocupa toda la pantalla */
+            overflow-y: scroll; /* ESTE es el único elemento que scrollea */
+            scroll-behavior: smooth;
+            
+            /* LA MAGIA DEL SCROLL SNAP (AHORA SÍ):
+              Aplicado al contenedor que SÍ scrollea.
+            */
+            scroll-snap-type: y mandatory;
+        }
+
+
+        /* --- CADA SECCIÓN COMPLETA --- */
+        .snap-section {
+            /* LA MAGIA DEL SCROLL SNAP:
+              Cada sección (hija directa del container) es un punto de "aterrizaje"
+            */
+            scroll-snap-align: start; /* Se alinea al inicio del viewport */
+            height: 100dvh; /* Ocupa el 100% de la altura visible */
+            position: relative;
+            overflow: hidden; /* Evita desbordes */
+            width: 100%;
+        }
+
+
+        /* --- 0. FONDO FIJO (Para secciones 2 y 3) --- */
+        #fixed-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100dvh;
+            z-index: 1; /* Está detrás de todo el contenido */
+            background-image: url('https://github.com/nsanchezBG/UrbanOAKDev/blob/main/Gemini_Generated_Image_bx1zucbx1zucbx1z2.png?raw=true');
+            background-size: cover;
+            background-position: center top;
+        }
+
+
+        /* --- 1. NUEVA CABECERA FIJA (para secciones 2 y 3) --- */
         #header {
-            position: sticky; /* Se queda fija en la parte superior */
+            position: fixed;
             top: 0;
             width: 100%;
-            height: 100dvh; /* Altura inicial (Dynamic Viewport Height) */
+            height: 80px;
             background-color: #000;
-            z-index: 100; /* Siempre encima de todo */
-            overflow: hidden;
-            transition: height 0.6s cubic-bezier(0.86, 0, 0.07, 1); /* Transición de altura */
+            z-index: 100; /* Encima de todo */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Empieza oculta fuera de la pantalla */
+            transform: translateY(-100%); 
+            transition: transform 0.6s cubic-bezier(0.86, 0, 0.07, 1);
         }
 
-        #header-container {
-            width: 100%;
-            height: 100%;
-            padding: 20px;
-            position: relative;
+        #header-logo {
+            width: 100px;
+            height: auto;
+        }
+
+        /* Estado visible: cuando el body tiene esta clase, la cabecera aparece */
+        body.header-visible #header {
+            transform: translateY(0);
+        }
+
+
+        /* --- 2. SECCIÓN 1: SPLASH (ex-header) --- */
+        #splash-section {
             display: flex;
             flex-direction: column;
-            justify-content: center; /* Centrado inicial */
+            justify-content: center;
             align-items: center;
+            background-color: #000; /* Fondo negro sólido */
+            z-index: 3; /* Se asegura de tapar el fondo fijo */
         }
 
-        /* --- 1a. Contenido de la Bienvenida --- */
-        #logo {
+        #splash-logo {
             width: 220px;
             max-width: 60%; 
-            height: auto; /* Mantiene la proporción */
-            transition: width 0.6s cubic-bezier(0.86, 0, 0.07, 1); /* Solo animar width */
+            height: auto; 
         }
 
         #coming-soon {
             font-size: 1.5rem;
             font-weight: 600;
             margin-top: 24px;
-            /* Transición para desvanecimiento Y para colapso de altura/margen */
-            transition: opacity 0.3s ease-out, transform 0.3s ease-out, 
-                        height 0.6s cubic-bezier(0.86, 0, 0.07, 1), 
-                        margin 0.6s cubic-bezier(0.86, 0, 0.07, 1);
         }
 
-        #scroll-arrow {
+        /* --- Petición 1: Cambiar #scroll-arrow por .scroll-arrow --- */
+        .scroll-arrow {
             width: 30px;
             position: absolute;
             bottom: 40px;
+            left: 50%;
+            /*
+              LA REGLA DE CENTRADO SE MUEVE A LA ANIMACIÓN
+              para evitar que la animación la sobreescriba.
+            */
             animation: bounce 2s infinite ease-in-out;
-            transition: opacity 0.3s ease-out, transform 0.3s ease-out; /* Transición de desvanecimiento */
+            z-index: 4; /* Asegura que esté sobre el degradado */
         }
 
+
+        /* --- LA CORRECCIÓN DE CENTRADO ESTÁ AQUÍ --- */
         @keyframes bounce {
             0%, 100% {
-                transform: translateY(0);
+                /* Se centra Y se mueve */
+                transform: translateX(-50%) translateY(0);
             }
             50% {
-                transform: translateY(10px);
+                /* Se centra Y se mueve */
+                transform: translateX(-50%) translateY(10px);
             }
         }
 
-        /* --- 2. Contenido Principal (Foto) --- */
-        #main-content {
-            height: 100dvh; 
-            position: relative;
-            z-index: 2; /* Está por encima de la capa de fondo fija (::before) */
-            background-color: transparent; 
+        /* --- 3. SECCIÓN 2: INSTAGRAM (ex-main-content) --- */
+        #insta-section {
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
+            background-color: transparent; /* Deja ver el fondo fijo */
+            z-index: 2; /* Encima del fondo fijo */
         }
-
-        /* --- Capa de fondo fija --- */
-        #main-content::before {
-            content: '';
-            position: fixed; /* Fija al viewport, NO se mueve con el scroll */
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100dvh; /* Ocupa toda la pantalla visible */
-            z-index: 1; /* Está detrás de #main-content (z-index: 2) */
-            
-            background-image: url('https://github.com/nsanchezBG/UrbanOAKDev/blob/main/Gemini_Generated_Image_bx1zucbx1zucbx1z2.png?raw=true');
-            background-size: cover;
-            background-position: center top; /* Posición para móvil (rostro y cielo) */
-        }
-
 
         #gradient-overlay {
             position: absolute;
@@ -120,7 +169,7 @@
             left: 0;
             width: 100%;
             height: 80%;
-            z-index: 3; /* Encima de la foto, pero debajo del texto */
+            z-index: 3; 
             background: linear-gradient(
                 to top, 
                 rgba(0,0,0,1) 15%,  
@@ -131,7 +180,7 @@
         
         #insta-content {
             position: relative;
-            z-index: 4; /* Encima del degradado */
+            z-index: 4; 
             color: white;
             text-decoration: none;
             cursor: pointer;
@@ -152,60 +201,133 @@
             transform: scale(1.1);
         }
 
-        
-        /* --- 3. ESTADOS DE SCROLL (La Magia) --- */
-        
-        body.scrolled #header {
-            height: 80px; /* La cabecera se encoge */
+        /* --- 4. SECCIÓN 3: NEWSLETTER --- */
+        #newsletter-section {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            width: 100%;
+            background-color: transparent; /* Deja ver el fondo fijo */
+            z-index: 2; /* Encima del fondo fijo */
         }
 
-        body.scrolled #header-container {
-            justify-content: center; /* Mantiene el logo centrado */
+        #newsletter-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.75); /* Overlay 75% negro */
+            z-index: 4; 
         }
 
-        body.scrolled #logo {
-            width: 100px; /* Logo más pequeño en la cabecera */
+        #newsletter-content {
+            position: relative;
+            z-index: 5; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 350px; 
         }
 
-        body.scrolled #coming-soon,
-        body.scrolled #scroll-arrow {
-            opacity: 0;
-            transform: translateY(20px);
-            pointer-events: none;
-            height: 0;
-            margin: 0;
-            overflow: hidden; 
+        .newsletter-logo {
+            width: 220px; 
+            max-width: 60%;
+            height: auto;
+            margin-bottom: 24px;
+        }
+
+        .hashtags {
+            font-family: 'Cal Sans', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 600;
+            line-height: 1.2;
+            margin-top: 0;
+            margin-bottom: 24px;
+            text-transform: uppercase;
+        }
+
+        .cta-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        #email-form {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #email-input {
+            width: 100%;
+            padding: 16px;
+            font-size: 1rem;
+            /* Fuente DM Sans Extralight (200) */
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 200;
+            background-color: transparent;
+            border: 2px solid white;
+            border-radius: 50px; 
+            color: white;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        #email-input::placeholder {
+            color: #ccc;
+            /* Hereda la fuente DM Sans Extralight del input */
+        }
+
+        #submit-button {
+            width: 100%;
+            padding: 16px;
+            font-size: 1rem;
+            font-family: 'Cal Sans', sans-serif;
+            font-weight: 600;
+            background-color: white;
+            color: black;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        #submit-button:hover {
+            transform: scale(1.05);
+        }
+
+        #form-status {
+            margin-top: 16px;
+            font-size: 0.9rem;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
         
         /* --- Media Queries para Responsive --- */
-
-        /* Para Tabletas y Escritorio (cuando el ancho de pantalla es mayor a 768px) */
         @media (min-width: 768px) {
-            #logo {
+            #splash-logo {
                 width: 250px; 
                 max-width: none;
             }
-
-            body.scrolled #logo {
-                width: 120px; 
+            
+            #header-logo {
+                width: 120px;
             }
 
             #coming-soon {
                 font-size: 2rem; 
             }
 
-            #scroll-arrow {
+            /* --- Petición 1: Cambiar #scroll-arrow por .scroll-arrow --- */
+            .scroll-arrow {
                 width: 40px; 
                 bottom: 60px;
             }
-
-            /* --- CORRECCIÓN DE POSICIÓN (DESKTOP) --- */
-            #main-content::before {
-                /* Se alinea igual que en móvil para mostrar rostro */
-                background-position: center top; 
-            }
-            /* --- FIN CORRECCIÓN --- */
-
 
             #gradient-overlay {
                 background: linear-gradient(
@@ -223,45 +345,185 @@
             #insta-icon {
                 width: 100px; 
             }
+
+            .newsletter-logo {
+                width: 250px;
+            }
+
+            .hashtags {
+                font-size: 2.5rem;
+            }
+
+            .cta-title {
+                font-size: 1.5rem;
+            }
         }
 
     </style>
 </head>
 <body>
 
-    <!-- 1. Pantalla de Bienvenida / Cabecera Fija -->
+    <!-- 
+        NUEVA ESTRUCTURA (ROBUSTA):
+        1. Fondo Fijo (para secciones 2 y 3)
+        2. Cabecera Fija (oculta al inicio)
+        3. Contenedor de Scroll (EL ÚNICO QUE SCROLLEA)
+    -->
+
+    <!-- 1. Fondo Fijo -->
+    <div id="fixed-background"></div>
+
+    <!-- 2. Cabecera Fija (oculta) -->
     <header id="header">
-        <div id="header-container">
-            <img id="logo" src="https://raw.githubusercontent.com/nsanchezBG/UrbanOAKDev/249f47e090c4eda1e4894a51722fadf69655b4d7/UrbanOAK-Sistema.png" alt="Urban Oak Logo">
-            <p id="coming-soon">Coming soon</p>
-            <img id="scroll-arrow" src="https://raw.githubusercontent.com/nsanchezBG/UrbanOAKDev/main/Recurso%202.png" alt="Scroll down">
-        </div>
+        <img id="header-logo" src="https://raw.githubusercontent.com/nsanchezBG/UrbanOAKDev/249f47e090c4eda1e4894a51722fadf69655b4d7/UrbanOAK-Sistema.png" alt="Urban Oak Logo">
     </header>
 
-    <!-- 2. Contenido Principal (Foto e Instagram) -->
-    <!-- Esta sección ahora es transparente y se desliza SOBRE el fondo fijo (::before) -->
-    <main id="main-content">
-        <!-- Capa de degradado CSS -->
-        <div id="gradient-overlay"></div>
+    <!-- 3. Contenedor de Scroll Snap -->
+    <main id="scroll-container">
+    
+        <!-- SECCIÓN 1: SPLASH -->
+        <section id="splash-section" class="snap-section">
+            <img id="splash-logo" src="https://raw.githubusercontent.com/nsanchezBG/UrbanOAKDev/249f47e090c4eda1e4894a51722fadf69655b4d7/UrbanOAK-Sistema.png" alt="Urban Oak Logo">
+            <p id="coming-soon">Coming soon</p>
+            <!-- HTML: Petición 1: Cambiado de ID a class -->
+            <img class="scroll-arrow" src="https://raw.githubusercontent.com/nsanchezBG/UrbanOAKDev/main/Recurso%202.png" alt="Scroll down">
+        </section>
+
+        <!-- SECCIÓN 2: INSTAGRAM -->
+        <section id="insta-section" class="snap-section">
+            <div id="gradient-overlay"></div>
+            <a href="https://instagram.com/urbanoak" target="_blank" rel="noopener noreferrer" id="insta-content">
+                <p>Síguenos en</p>
+                <!-- URL Corregida -->
+                <img id="insta-icon" src="https://github.com/nsanchezBG/UrbanOAKDev/blob/main/instagram-white-icon.webp?raw=true" alt="Instagram Logo">
+            </a>
+            <!-- HTML: Petición 1: Añadida flecha a sección 2 -->
+            <img class="scroll-arrow" src="https://raw.githubusercontent.com/nsanchezBG/UrbanOAKDev/main/Recurso%202.png" alt="Scroll down">
+        </section>
+
+        <!-- SECCIÓN 3: NEWSLETTER -->
+        <section id="newsletter-section" class="snap-section">
+            <div id="newsletter-overlay"></div>
+            <div id="newsletter-content">
+                <img class="newsletter-logo" src="https://raw.githubusercontent.com/nsanchezBG/UrbanOAKDev/249f47e090c4eda1e4894a51722fadf69655b4d7/UrbanOAK-Sistema.png" alt="Urban Oak Logo">
+                <h2 class="hashtags">
+                    #PERUVIAN<br>
+                    #PIMA<br>
+                    #BASIC<br>
+                    #TEES
+                </h2>
+                <p class="cta-title">Entérate primero</p>
+                <form id="email-form" action="https://formspree.io/f/mblqrlje" method="POST">
+                    <input type="email" id="email-input" name="email" placeholder="Tu email" required>
+                    <button type="submit" id="submit-button">¡AVÍSENME!</button>
+                    <p id="form-status"></p>
+                </form>
+            </div>
+        </section>
         
-        <!-- Contenido de Instagram (enlazado) -->
-        <a href="https://instagram.com/urbanoak" target="_blank" rel="noopener noreferrer" id="insta-content">
-            <p>Síguenos en</p>
-            <img id="insta-icon" src="https://github.com/nsanchezBG/UrbanOAKDev/blob/main/instagram-white-icon.webp?raw=true" alt="Instagram Logo">
-        </a>
     </main>
 
-    <!-- 3. JavaScript para detectar el scroll -->
+    <!-- 4. JavaScript -->
     <script>
-        window.addEventListener('scroll', function() {
-            const scrollPosition = window.scrollY;
+        // --- 1. Intersection Observer para la cabecera ---
+        // Este script detecta cuándo sales de la primera sección
+        // para mostrar la cabecera fija.
 
-            if (scrollPosition > 10) {
-                document.body.classList.add('scrolled');
+        const splashSection = document.getElementById('splash-section');
+        const header = document.getElementById('header');
+        // CLAVE: El "root" (raíz) del observador es ahora el contenedor que scrollea
+        const scrollContainer = document.getElementById('scroll-container'); 
+
+        // --- JS: Petición 2: Observar también la sección 3 ---
+        const newsletterSection = document.getElementById('newsletter-section');
+        
+        // --- JS: Petición 2: Guardar el estado de visibilidad ---
+        let isSplashVisible = true;
+        let isNewsletterVisible = false;
+
+
+        const observerOptions = {
+            root: scrollContainer, // Observa el scroll DENTRO de #scroll-container
+            threshold: 0.1 // Se activa cuando menos del 10% de la sección es visible
+        };
+        
+        // --- JS: Petición 2: Función para actualizar el header ---
+        function updateHeaderVisibility() {
+            // Lógica: Mostrar header solo si NO estamos en splash Y NO estamos en newsletter
+            // (es decir, solo en la sección 2)
+            if (!isSplashVisible && !isNewsletterVisible) {
+                document.body.classList.add('header-visible');
             } else {
-                document.body.classList.remove('scrolled');
+                document.body.classList.remove('header-visible');
             }
-        });
+        }
+
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                
+                // --- JS: Petición 2: Lógica de observer actualizada ---
+                if (entry.target.id === 'splash-section') {
+                    isSplashVisible = entry.isIntersecting;
+                }
+                if (entry.target.id === 'newsletter-section') {
+                    isNewsletterVisible = entry.isIntersecting;
+                }
+            });
+            
+            // Llamar a la función de actualización
+            updateHeaderVisibility();
+
+        }, observerOptions);
+
+        // Empezar a observar la sección splash
+        observer.observe(splashSection);
+        // --- JS: Petición 2: Empezar a observar la sección 3 ---
+        observer.observe(newsletterSection);
+
+
+        // --- 2. Manejador del formulario de Email (sin cambios) ---
+        var form = document.getElementById("email-form");
+        var statusMessage = document.getElementById("form-status");
+        var submitButton = document.getElementById("submit-button");
+    
+        async function handleSubmit(event) {
+            event.preventDefault(); 
+            var data = new FormData(event.target);
+            
+            try {
+                var response = await fetch(event.target.action, {
+                    method: form.method,
+                    body: data,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    statusMessage.innerHTML = "¡Gracias! Estás en la lista.";
+                    statusMessage.style.color = "white";
+                    form.reset(); 
+                    submitButton.disabled = true; 
+                    submitButton.innerHTML = "ENVIADO";
+                } else {
+                    response.json().then(data => {
+                        if (Object.hasOwn(data, 'errors')) {
+                            statusMessage.innerHTML = data["errors"].map(error => error["message"]).join(", ");
+                        } else {
+                            statusMessage.innerHTML = "Hubo un error al enviar. Intenta de nuevo.";
+                        }
+                        statusMessage.style.color = "red";
+                    });
+                }
+            } catch (error) {
+                statusMessage.innerHTML = "Hubo un error al enviar. Intenta de nuevo.";
+                statusMessage.style.color = "red";
+            }
+        }
+    
+        form.addEventListener("submit", handleSubmit);
+
     </script>
 
 </body>

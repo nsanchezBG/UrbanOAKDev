@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -33,7 +32,8 @@
             position: sticky; /* Se queda fija en la parte superior */
             top: 0;
             width: 100%;
-            height: 100vh; /* Altura inicial */
+            /* CORRECCIÓN 3: Usar dvh para ajustarse a UI del navegador móvil */
+            height: 100dvh; /* Altura inicial (Dynamic Viewport Height) */
             background-color: #000;
             z-index: 100;
             overflow: hidden;
@@ -49,21 +49,25 @@
             flex-direction: column;
             justify-content: center; /* Centrado inicial */
             align-items: center;
-            transition: justify-content 0.6s cubic-bezier(0.86, 0, 0.07, 1);
         }
 
         /* --- 1a. Contenido de la Bienvenida --- */
         #logo {
             width: 220px;
-            max-width: 60%; /* Ajuste para asegurar que quepa bien en el estado inicial */
-            transition: width 0.6s cubic-bezier(0.86, 0, 0.07, 1); /* Transición de tamaño */
+            max-width: 60%; 
+            /* CORRECCIÓN 2: Asegurar aspect-ratio en transición */
+            height: auto; /* Mantiene la proporción */
+            transition: width 0.6s cubic-bezier(0.86, 0, 0.07, 1); /* Solo animar width */
         }
 
         #coming-soon {
             font-size: 1.5rem;
             font-weight: 600;
             margin-top: 24px;
-            transition: opacity 0.3s ease-out, transform 0.3s ease-out; /* Transición de desvanecimiento */
+            /* Transición para desvanecimiento Y para colapso de altura/margen */
+            transition: opacity 0.3s ease-out, transform 0.3s ease-out, 
+                        height 0.6s cubic-bezier(0.86, 0, 0.07, 1), 
+                        margin 0.6s cubic-bezier(0.86, 0, 0.07, 1);
         }
 
         #scroll-arrow {
@@ -86,13 +90,17 @@
 
         /* --- 2. Contenido Principal (Foto) --- */
         #main-content {
-            height: 100vh;
+            /* CORRECCIÓN 3: Usar dvh para ajustarse a UI del navegador móvil */
+            height: 100dvh; 
             position: relative;
             z-index: 1;
             background-image: url('https://github.com/nsanchezBG/UrbanOAKDev/blob/main/Gemini_Generated_Image_bx1zucbx1zucbx1z2.png?raw=true');
             background-size: cover;
-            /* background-position se ajusta con Media Queries más abajo */
-            background-attachment: fixed; /* Efecto Parallax */
+            
+            /* CORRECCIÓN 1: 'scroll' (default) para móvil, 'fixed' para desktop */
+            background-attachment: scroll; /* Comportamiento normal para móvil */
+            background-position: center top; /* Posición para móvil */
+
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -106,8 +114,13 @@
             left: 0;
             width: 100%;
             height: 80%;
-            /* background-image se ajusta con Media Queries más abajo */
             z-index: 2;
+            background: linear-gradient(
+                to top, 
+                rgba(0,0,0,1) 15%,  /* Un poco más intenso en móviles */
+                rgba(0,0,0,0.8) 50%, 
+                rgba(0,0,0,0) 100%
+            );
         }
         
         #insta-content {
@@ -146,12 +159,20 @@
         }
 
         body.scrolled #logo {
-            width: 120px; /* Logo más pequeño cuando está en la cabecera fija */
-            max-width: 50%; /* Asegura que no sea demasiado grande en la cabecera */
+            width: 100px; /* Logo más pequeño en la cabecera */
+            /* Se quitó max-height para evitar deformación */
         }
 
         /* Desaparece el texto y la flecha */
-        body.scrolled #coming-soon,
+        body.scrolled #coming-soon {
+            opacity: 0;
+            transform: translateY(20px);
+            pointer-events: none;
+            height: 0;
+            margin: 0;
+            overflow: hidden; 
+        }
+        
         body.scrolled #scroll-arrow {
             opacity: 0;
             transform: translateY(20px);
@@ -160,19 +181,7 @@
 
         /* --- Media Queries para Responsive --- */
 
-        /* Estilos por defecto para Móviles (primero mobile-first) */
-        #main-content {
-            background-position: center 30%; /* Centra más la imagen verticalmente para móviles */
-        }
-
-        #gradient-overlay {
-            background: linear-gradient(
-                to top, 
-                rgba(0,0,0,1) 15%,  /* Un poco más intenso en móviles */
-                rgba(0,0,0,0.8) 50%, 
-                rgba(0,0,0,0) 100%
-            );
-        }
+        /* Estilos por defecto para Móviles (primero mobile-first) ya están arriba */
 
 
         /* Para Tabletas y Escritorio (cuando el ancho de pantalla es mayor a 768px) */
@@ -183,7 +192,7 @@
             }
 
             body.scrolled #logo {
-                width: 150px; /* Logo en cabecera para desktop (estado scrolled) */
+                width: 120px; /* Logo en cabecera para desktop */
             }
 
             #coming-soon {
@@ -196,6 +205,8 @@
             }
 
             #main-content {
+                /* CORRECCIÓN 1: Reactivar Parallax solo en desktop */
+                background-attachment: fixed; 
                 background-position: center center; /* Centrado clásico para desktop */
             }
 
@@ -227,13 +238,13 @@
             <!-- El logo (se anima con CSS) -->
             <img id="logo" src="https://raw.githubusercontent.com/nsanchezBG/UrbanOAKDev/249f47e090c4eda1e4894a51722fadf69655b4d7/UrbanOAK-Sistema.png" alt="Urban Oak Logo">
             
-            <!-- Texto (se desvanece con CSS) -->
+            <!-- Texto (se desvanece Y COLAPSA con CSS) -->
             <p id="coming-soon">Coming soon</p>
 
             <!-- Flecha animada (se desvanece con CSS) -->
             <img id="scroll-arrow" src="https://raw.githubusercontent.com/nsanchezBG/UrbanOAKDev/main/Recurso%202.png" alt="Scroll down">
         </div>
-    </header>
+    </header
 
     <!-- 2. Contenido Principal (Foto e Instagram) -->
     <main id="main-content">

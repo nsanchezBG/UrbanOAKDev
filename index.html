@@ -1,1 +1,267 @@
 
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Urban Oak - Coming Soon</title>
+    
+    <!-- Importar la fuente Cal Sans -->
+    <link href="https://api.fontshare.com/v2/css?f[]=cal-sans@600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- Configuración Global --- */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Cal Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #000;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        /* --- 1. Cabecera / Pantalla de Bienvenida --- */
+        #header {
+            position: sticky; /* Se queda fija en la parte superior */
+            top: 0;
+            width: 100%;
+            height: 100vh; /* Altura inicial */
+            background-color: #000;
+            z-index: 100;
+            overflow: hidden;
+            transition: height 0.6s cubic-bezier(0.86, 0, 0.07, 1); /* Transición de altura */
+        }
+
+        #header-container {
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* Centrado inicial */
+            align-items: center;
+            transition: justify-content 0.6s cubic-bezier(0.86, 0, 0.07, 1);
+        }
+
+        /* --- 1a. Contenido de la Bienvenida --- */
+        #logo {
+            width: 220px;
+            max-width: 60%; /* Ajuste para asegurar que quepa bien en el estado inicial */
+            transition: width 0.6s cubic-bezier(0.86, 0, 0.07, 1); /* Transición de tamaño */
+        }
+
+        #coming-soon {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-top: 24px;
+            transition: opacity 0.3s ease-out, transform 0.3s ease-out; /* Transición de desvanecimiento */
+        }
+
+        #scroll-arrow {
+            width: 30px;
+            position: absolute;
+            bottom: 40px;
+            animation: bounce 2s infinite ease-in-out;
+            transition: opacity 0.3s ease-out, transform 0.3s ease-out; /* Transición de desvanecimiento */
+        }
+
+        /* Animación de la flecha */
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(10px);
+            }
+        }
+
+        /* --- 2. Contenido Principal (Foto) --- */
+        #main-content {
+            height: 100vh;
+            position: relative;
+            z-index: 1;
+            background-image: url('https://github.com/nsanchezBG/UrbanOAKDev/blob/main/Gemini_Generated_Image_bx1zucbx1zucbx1z2.png?raw=true');
+            background-size: cover;
+            /* background-position se ajusta con Media Queries más abajo */
+            background-attachment: fixed; /* Efecto Parallax */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        #gradient-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 80%;
+            /* background-image se ajusta con Media Queries más abajo */
+            z-index: 2;
+        }
+        
+        #insta-content {
+            position: relative;
+            z-index: 3; /* Encima del degradado */
+            color: white;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        #insta-content p {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        #insta-icon {
+            width: 80px;
+            transition: transform 0.3s ease;
+        }
+
+        #insta-content:hover #insta-icon {
+            transform: scale(1.1);
+        }
+
+        
+        /* --- 3. ESTADOS DE SCROLL (La Magia) --- */
+        
+        /* Cuando el body tiene la clase 'scrolled' (añadida por JS) */
+        body.scrolled #header {
+            height: 80px; /* La cabecera se encoge */
+        }
+
+        body.scrolled #header-container {
+            justify-content: center; /* Mantiene el logo centrado */
+        }
+
+        body.scrolled #logo {
+            width: 120px; /* Logo más pequeño cuando está en la cabecera fija */
+            max-width: 50%; /* Asegura que no sea demasiado grande en la cabecera */
+        }
+
+        /* Desaparece el texto y la flecha */
+        body.scrolled #coming-soon,
+        body.scrolled #scroll-arrow {
+            opacity: 0;
+            transform: translateY(20px);
+            pointer-events: none;
+        }
+
+        /* --- Media Queries para Responsive --- */
+
+        /* Estilos por defecto para Móviles (primero mobile-first) */
+        #main-content {
+            background-position: center 30%; /* Centra más la imagen verticalmente para móviles */
+        }
+
+        #gradient-overlay {
+            background: linear-gradient(
+                to top, 
+                rgba(0,0,0,1) 15%,  /* Un poco más intenso en móviles */
+                rgba(0,0,0,0.8) 50%, 
+                rgba(0,0,0,0) 100%
+            );
+        }
+
+
+        /* Para Tabletas y Escritorio (cuando el ancho de pantalla es mayor a 768px) */
+        @media (min-width: 768px) {
+            #logo {
+                width: 250px; /* Un poco más grande en desktop (estado inicial) */
+                max-width: none;
+            }
+
+            body.scrolled #logo {
+                width: 150px; /* Logo en cabecera para desktop (estado scrolled) */
+            }
+
+            #coming-soon {
+                font-size: 2rem; /* Texto más grande en desktop */
+            }
+
+            #scroll-arrow {
+                width: 40px; /* Flecha más grande en desktop */
+                bottom: 60px;
+            }
+
+            #main-content {
+                background-position: center center; /* Centrado clásico para desktop */
+            }
+
+            #gradient-overlay {
+                background: linear-gradient(
+                    to top, 
+                    rgba(0,0,0,1) 10%, 
+                    rgba(0,0,0,0.7) 50%, /* Degradado un poco menos opaco en desktop */
+                    rgba(0,0,0,0) 100%
+                );
+            }
+
+            #insta-content p {
+                font-size: 2.2rem; /* Texto Instagram más grande */
+            }
+
+            #insta-icon {
+                width: 100px; /* Icono Instagram más grande */
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- 1. Pantalla de Bienvenida / Cabecera Fija -->
+    <header id="header">
+        <div id="header-container">
+            <!-- El logo (se anima con CSS) -->
+            <img id="logo" src="https://raw.githubusercontent.com/nsanchezBG/UrbanOAKDev/249f47e090c4eda1e4894a51722fadf69655b4d7/UrbanOAK-Sistema.png" alt="Urban Oak Logo">
+            
+            <!-- Texto (se desvanece con CSS) -->
+            <p id="coming-soon">Coming soon</p>
+
+            <!-- Flecha animada (se desvanece con CSS) -->
+            <img id="scroll-arrow" src="https://raw.githubusercontent.com/nsanchezBG/UrbanOAKDev/main/Recurso%202.png" alt="Scroll down">
+        </div>
+    </header>
+
+    <!-- 2. Contenido Principal (Foto e Instagram) -->
+    <main id="main-content">
+        <!-- Capa de degradado CSS -->
+        <div id="gradient-overlay"></div>
+        
+        <!-- Contenido de Instagram (enlazado) -->
+        <a href="https://instagram.com/urbanoak" target="_blank" rel="noopener noreferrer" id="insta-content">
+            <p>Síguenos en</p>
+            <img id="insta-icon" src="https://github.com/nsanchezBG/UrbanOAKDev/blob/main/instagram-white-icon.webp?raw=true" alt="Instagram Logo">
+        </a>
+    </main>
+
+    <!-- 3. JavaScript para detectar el scroll -->
+    <script>
+        window.addEventListener('scroll', function() {
+            const scrollPosition = window.scrollY;
+
+            // Si el usuario ha bajado más de 10 píxeles
+            if (scrollPosition > 10) {
+                // Añadimos la clase 'scrolled' al body
+                document.body.classList.add('scrolled');
+            } else {
+                // Si vuelve arriba, la quitamos
+                document.body.classList.remove('scrolled');
+            }
+        });
+    </script>
+
+</body>
+</html>

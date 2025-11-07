@@ -32,10 +32,9 @@
             position: sticky; /* Se queda fija en la parte superior */
             top: 0;
             width: 100%;
-            /* CORRECCIÓN 3: Usar dvh para ajustarse a UI del navegador móvil */
             height: 100dvh; /* Altura inicial (Dynamic Viewport Height) */
             background-color: #000;
-            z-index: 100;
+            z-index: 100; /* Siempre encima de todo */
             overflow: hidden;
             transition: height 0.6s cubic-bezier(0.86, 0, 0.07, 1); /* Transición de altura */
         }
@@ -55,7 +54,6 @@
         #logo {
             width: 220px;
             max-width: 60%; 
-            /* CORRECCIÓN 2: Asegurar aspect-ratio en transición */
             height: auto; /* Mantiene la proporción */
             transition: width 0.6s cubic-bezier(0.86, 0, 0.07, 1); /* Solo animar width */
         }
@@ -78,7 +76,6 @@
             transition: opacity 0.3s ease-out, transform 0.3s ease-out; /* Transición de desvanecimiento */
         }
 
-        /* Animación de la flecha */
         @keyframes bounce {
             0%, 100% {
                 transform: translateY(0);
@@ -90,17 +87,10 @@
 
         /* --- 2. Contenido Principal (Foto) --- */
         #main-content {
-            /* CORRECCIÓN 3: Usar dvh para ajustarse a UI del navegador móvil */
             height: 100dvh; 
             position: relative;
-            z-index: 1;
-            background-image: url('https://github.com/nsanchezBG/UrbanOAKDev/blob/main/Gemini_Generated_Image_bx1zucbx1zucbx1z2.png?raw=true');
-            background-size: cover;
-            
-            /* CORRECCIÓN 1: 'scroll' (default) para móvil, 'fixed' para desktop */
-            background-attachment: scroll; /* Comportamiento normal para móvil */
-            background-position: center top; /* Posición para móvil */
-
+            z-index: 2; /* Está por encima de la capa de fondo fija (::before) */
+            background-color: transparent; 
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -108,16 +98,32 @@
             text-align: center;
         }
 
+        /* --- Capa de fondo fija --- */
+        #main-content::before {
+            content: '';
+            position: fixed; /* Fija al viewport, NO se mueve con el scroll */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100dvh; /* Ocupa toda la pantalla visible */
+            z-index: 1; /* Está detrás de #main-content (z-index: 2) */
+            
+            background-image: url('https://github.com/nsanchezBG/UrbanOAKDev/blob/main/Gemini_Generated_Image_bx1zucbx1zucbx1z2.png?raw=true');
+            background-size: cover;
+            background-position: center top; /* Posición para móvil (rostro y cielo) */
+        }
+
+
         #gradient-overlay {
             position: absolute;
             bottom: 0;
             left: 0;
             width: 100%;
             height: 80%;
-            z-index: 2;
+            z-index: 3; /* Encima de la foto, pero debajo del texto */
             background: linear-gradient(
                 to top, 
-                rgba(0,0,0,1) 15%,  /* Un poco más intenso en móviles */
+                rgba(0,0,0,1) 15%,  
                 rgba(0,0,0,0.8) 50%, 
                 rgba(0,0,0,0) 100%
             );
@@ -125,7 +131,7 @@
         
         #insta-content {
             position: relative;
-            z-index: 3; /* Encima del degradado */
+            z-index: 4; /* Encima del degradado */
             color: white;
             text-decoration: none;
             cursor: pointer;
@@ -149,7 +155,6 @@
         
         /* --- 3. ESTADOS DE SCROLL (La Magia) --- */
         
-        /* Cuando el body tiene la clase 'scrolled' (añadida por JS) */
         body.scrolled #header {
             height: 80px; /* La cabecera se encoge */
         }
@@ -160,11 +165,10 @@
 
         body.scrolled #logo {
             width: 100px; /* Logo más pequeño en la cabecera */
-            /* Se quitó max-height para evitar deformación */
         }
 
-        /* Desaparece el texto y la flecha */
-        body.scrolled #coming-soon {
+        body.scrolled #coming-soon,
+        body.scrolled #scroll-arrow {
             opacity: 0;
             transform: translateY(20px);
             pointer-events: none;
@@ -173,58 +177,51 @@
             overflow: hidden; 
         }
         
-        body.scrolled #scroll-arrow {
-            opacity: 0;
-            transform: translateY(20px);
-            pointer-events: none;
-        }
-
         /* --- Media Queries para Responsive --- */
-
-        /* Estilos por defecto para Móviles (primero mobile-first) ya están arriba */
-
 
         /* Para Tabletas y Escritorio (cuando el ancho de pantalla es mayor a 768px) */
         @media (min-width: 768px) {
             #logo {
-                width: 250px; /* Un poco más grande en desktop (estado inicial) */
+                width: 250px; 
                 max-width: none;
             }
 
             body.scrolled #logo {
-                width: 120px; /* Logo en cabecera para desktop */
+                width: 120px; 
             }
 
             #coming-soon {
-                font-size: 2rem; /* Texto más grande en desktop */
+                font-size: 2rem; 
             }
 
             #scroll-arrow {
-                width: 40px; /* Flecha más grande en desktop */
+                width: 40px; 
                 bottom: 60px;
             }
 
-            #main-content {
-                /* CORRECCIÓN 1: Reactivar Parallax solo en desktop */
-                background-attachment: fixed; 
-                background-position: center center; /* Centrado clásico para desktop */
+            /* --- CORRECCIÓN DE POSICIÓN (DESKTOP) --- */
+            #main-content::before {
+                /* Se alinea igual que en móvil para mostrar rostro */
+                background-position: center top; 
             }
+            /* --- FIN CORRECCIÓN --- */
+
 
             #gradient-overlay {
                 background: linear-gradient(
                     to top, 
                     rgba(0,0,0,1) 10%, 
-                    rgba(0,0,0,0.7) 50%, /* Degradado un poco menos opaco en desktop */
+                    rgba(0,0,0,0.7) 50%, 
                     rgba(0,0,0,0) 100%
                 );
             }
 
             #insta-content p {
-                font-size: 2.2rem; /* Texto Instagram más grande */
+                font-size: 2.2rem; 
             }
 
             #insta-icon {
-                width: 100px; /* Icono Instagram más grande */
+                width: 100px; 
             }
         }
 
@@ -235,18 +232,14 @@
     <!-- 1. Pantalla de Bienvenida / Cabecera Fija -->
     <header id="header">
         <div id="header-container">
-            <!-- El logo (se anima con CSS) -->
             <img id="logo" src="https://raw.githubusercontent.com/nsanchezBG/UrbanOAKDev/249f47e090c4eda1e4894a51722fadf69655b4d7/UrbanOAK-Sistema.png" alt="Urban Oak Logo">
-            
-            <!-- Texto (se desvanece Y COLAPSA con CSS) -->
             <p id="coming-soon">Coming soon</p>
-
-            <!-- Flecha animada (se desvanece con CSS) -->
             <img id="scroll-arrow" src="https://raw.githubusercontent.com/nsanchezBG/UrbanOAKDev/main/Recurso%202.png" alt="Scroll down">
         </div>
-    </header
+    </header>
 
     <!-- 2. Contenido Principal (Foto e Instagram) -->
+    <!-- Esta sección ahora es transparente y se desliza SOBRE el fondo fijo (::before) -->
     <main id="main-content">
         <!-- Capa de degradado CSS -->
         <div id="gradient-overlay"></div>
@@ -263,12 +256,9 @@
         window.addEventListener('scroll', function() {
             const scrollPosition = window.scrollY;
 
-            // Si el usuario ha bajado más de 10 píxeles
             if (scrollPosition > 10) {
-                // Añadimos la clase 'scrolled' al body
                 document.body.classList.add('scrolled');
             } else {
-                // Si vuelve arriba, la quitamos
                 document.body.classList.remove('scrolled');
             }
         });
